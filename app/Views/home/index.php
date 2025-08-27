@@ -4,12 +4,12 @@ echo $this->section('content');?>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <?= anchor('','Home')?></li>
-        <li class="breadcrumb-item active" aria-current="pag"> Lançamentos</li>
+        <li class="breadcrumb-item active" aria-current="pag"> Home</li>
     </ol>
 </nav>
 <div class="card">
     <div class="card-header">
-        Lançamentos
+        Home
     </div>
     <div class="card-body">
         Conteúdo
