@@ -66,9 +66,52 @@ class BaseModel extends Model
     }
 
     // injeta o campo tipo na query de busca
-    public function addTipo($tipo = null) {
+    public function addTipo($tipo = null)
+    {
         if (!is_null($tipo)) {
-            $this->where('tipo', $tipo);
+            $db     = \Config\Database::connect();
+            $fields = $db->getFieldNames($this->table);
+
+            if (in_array('categorias_id', $fields)) {
+                $this->join('categorias', "categorias.id = {$this->table}.categorias_id AND {$this->table}.usuarios_id = categorias.usuarios_id");
+                $this->where('categorias.tipo', $tipo);
+            }
+        }
+
+        return $this;
+    }
+
+    
+    // retorna os registros baseado na informação de consolidação
+    // é preciso que a tabela lançamentos exista na query
+    // valor 1 = Sim, 2 = Não
+    public function addConsolidado($valor = null) {
+        if (!is_null($valor)) {
+            $this->where('lancamentos.consolidado', $valor);
+        }
+        return $this;
+    }
+
+    // filtra os registros por mês
+    public function addMes($mes = null) {
+        if (!is_null($mes)) {
+            $this->where("MONTH(data)", $mes);
+        }
+        return $this;
+    }
+
+    // filtra os registros por ano
+    public function addAno($ano = null) {
+        if (!is_null($ano)) {
+            $this->where("YEAR(data)", $ano);
+        }
+        return $this;
+    }
+
+    // injeta a busca por id da categoria dentro da query
+    public function addIdCategoria($idCategoria = null) {
+        if (!is_null($idCategoria)) {
+            $this->where('categorias_id', $idCategoria);
         }
         return $this;
     }
@@ -95,5 +138,6 @@ class BaseModel extends Model
     protected function converteData($data) {
         return $data;
     }
+
 }
 ?>

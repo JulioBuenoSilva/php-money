@@ -71,10 +71,24 @@ class CategoriaModel extends BaseModel
                     '---' => [
                         'n' => 'Nova categoria...'
                     ]
-                    ];
+                ];
             }
         }
         
         return $selectConteudo + $novaCategoria;
+    }
+
+    // retorna as categorias que possuem lançamentos vinculados
+    public function getComLancamentos() {
+        $this->select(' 
+            categorias.usuarios_id, 
+            categorias.descricao AS descricao_categoria, 
+            categorias.id AS id_categoria, 
+            lancamentos.descricao AS descricao_lancamento, 
+            lancamentos.id AS id_lancamentos'
+        );
+        $this->join('lancamentos', 'lancamentos.categorias_id = categorias.id');
+        $this->groupBy('descricao_categoria');
+        return $this->findAll();
     }
 }

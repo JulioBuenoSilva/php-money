@@ -9,6 +9,7 @@ class Categoria extends BaseController
     protected $categoriaModel;
 
     public function __construct(){
+        parent::__construct(); 
         $this->categoriaModel = new CategoriaModel();
         $this->session = \Config\Services::session(); 
     }

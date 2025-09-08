@@ -46,6 +46,7 @@ abstract class BaseController extends Controller
     public function __construct()
     {
         $this->session = \Config\Services::session();
+        $this->session->start(); 
         if (!$this->session->has('id_usuario')) {
             $this->session->set('id_usuario', 1);
         }

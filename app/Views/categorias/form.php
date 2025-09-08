@@ -5,14 +5,14 @@ echo $this->section('content');?>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <?= anchor('','Home')?></li>
-        <li class="breadcrumb-item"> <?= anchor('categoria','Categorias')?>Categorias</li>
+        <li class="breadcrumb-item"> <?= anchor('categoria','Categorias')?></li>
         <li class="breadcrumb-item" aria-current="page"> <?= $titulo ?></li>
     </ol>
 </nav>
 
 <h1>Categorias</h1>
 <div class="card">
-    <div class="card-header"><?= $titulo?></div>
+    <div class="card-header"><h2><?= $titulo?></h2></div>
     <div class="card-body">
         <?= form_open('categoria/store') ?> 
             <div class="form-group col-sm-6">

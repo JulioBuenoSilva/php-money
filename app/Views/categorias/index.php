@@ -11,6 +11,7 @@ echo $this->section('content');?>
         return true
     }
 </script>
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <?= anchor('','Home')?></li>

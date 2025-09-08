@@ -3,84 +3,8 @@ echo $this->extend('_common/layout');
 echo $this->section('content');
 ?>
 
-<script> 
+<script type="text/javascript" src="<?= base_url('assets/js/novaCategoria.js')?>"></script>
 
-    // chama o modalNovaCategoria
-    function modalNovaCategoria(valor)
-    {
-        if (valor == 'n') {
-            $('#modalNovaCategoria').modal('show');
-            $('#modalNovaCategoria').on('shown.bs.modal', function(e) {
-                $('#descricao_nova_categoria').focus();
-                $('#descricao_nova_categoria').empty();
-            });
-        }
-    }
-
-    function salvaNovaCategoria()
-    {
-        var descricao = $('#descricao_nova_categoria');
-        var tipo = $('#tipo_nova_categoria');
-
-        if (descricao.val() == '' || tipo.val() == '') {
-            alert('Preencha todos os campos antes de continuar');
-            descricao.focus();
-            return false;
-        }
-
-        $.post(base_url + 'Ajax/Categoria/store', {
-            descricao: descricao.val(),
-            tipo: tipo.val()
-        }, function(data) {
-            if (data.error === true ) {
-                if ('descricao' in data.message) {
-                    $('#erro_descricao').css({
-                        'margin-top': '5px',
-                        'color': 'red'
-                    }).html(data.message['descricao'])
-                } else {
-                    $('#erro_descricao').html('').hide();
-                } 
-                if ('tipo' in data.message) {
-                    $('#erro_tipo').css({
-                        'margin-top': '5px',
-                        'color': 'red'
-                    }).html(data.message['tipo'])
-                } else {
-                    $('#erro_tipo').html('').hide();
-                } 
-            } else {
-                $('erro_descricao').hide();
-                $('#erro_tipo').hide();
-                $('#modalNovaCategoria').modal('hide');
-                carregaCategoriasDropdown(data.id);
-            }
-        }, 'json'
-        );
-    }
-
-    function carregaCategoriasDropdown(id){
-        $('#spinnerLoading').show();
-        $selectCategorias = $('#categorias_id');
-        $selectCategorias.empty();
-        $.get(base_url + '/Ajax/Categoria/get', {}, 
-            function(data) {
-                data.forEach(categoria => {
-                    if (id == categoria.id) {
-                        $selectCategorias.append($('<option selected />').val(categoria.id).text(categoria.descricao));
-                    }
-                    else {
-                        $selectCategorias.append($('<option />').val(categoria.id).text(categoria.descricao));
-                    }
-                });
-
-                $optGroup = $("<optgroup label='---'>");
-                $optGroup.append($('<option />').val('n').text('Nova Categoria...'));
-                $selectCategorias.append($optGroup);
-                $('#spinnerLoading').hide();
-            }, 'json');
-    }
-</script>
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <?= anchor('','Home')?></li>
@@ -92,7 +16,7 @@ echo $this->section('content');
 <h1>Orçamentos</h1>
 
 <div class="card">
-    <div class="card-header"><?= $titulo?></div>
+    <div class="card-header"> <h2><?= $titulo?></h2></div>
     <div class="card-body">
     <?= form_open('orcamento/store')?>
 
@@ -151,41 +75,7 @@ echo $this->section('content');
         <input type="hidden" name="chave" value="<?= !empty($orcamento['chave']) ? $orcamento['chave'] : set_value('chave')?>">
     <?= form_close()?>
     </div>
-    <div class="modal fade" id="modalNovaCategoria" tabindex="-1" role="dialog" aria-labelledby="modalNovaCategoriaLabel"
-    aria-hidden="true">
-        <div class="modal-dialog" role="document"> 
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nova Categoria</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar"> 
-                        <span aria-hidden="true"> &times; </span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="descricao_nova_categoria">Categoria</label>
-                        <input type="text" name="descricao_nova_categoria" id="descricao_nova_categoria" required class="form-control">
-                        <div id="erro_descricao">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipo_nova_categoria">Tipo</label>
-                        <?= form_dropdown('tipo_nova_categoria', [
-                            '' => 'Selecione', 
-                            'd' => 'Despesa', 
-                            'r' => 'Receita'
-                        ], null, "id='tipo_nova_categoria' class='form-control'"
-                        )?>
-                        <div id="erro_tipo">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-light border-primary text-primary" data-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="salvaNovaCategoria()">Salvar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+
+<?= $this->include('_common/components/modalNovaCategoria') ?>
 <?php echo $this->endSection('content')?>
