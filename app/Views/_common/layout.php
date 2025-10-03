@@ -39,17 +39,20 @@
                 <li class="nav-item"><a href="<?= base_url('lancamento')?>" class="nav-link">Lançamentos</a></li>
                 <li class="nav-item"><a href="<?= base_url('categoria')?>" class="nav-link">Categorias</a></li>
                 <li class="nav-item"><a href="<?= base_url('orcamento')?>" class="nav-link">Orçamentos</a></li>
-                <li class="nav-item"><a href="<?= base_url('relatorio')?>" class="nav-link">Relatório</a></li>            
+                <li class="nav-item"><a href="<?= base_url('relatorio')?>" class="nav-link">Relatório</a></li>          
+                <li class="nav-item"><a href="<?= base_url('admin/home')?>" class="nav-link">Área Administrativa</a></li>          
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true">
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="<?=base_url('perfil')?>">Perfis</a>
-                            <a class="dropdown-item" href="<?=base_url('usuario')?>">Usuarios</a>
-                        </div>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" 
+                    role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Menu
                     </a>
-                </li>            
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="<?=base_url('perfil')?>">Perfis</a>
+                        <a class="dropdown-item" href="<?=base_url('usuario')?>">Usuarios</a>
+                    </div>
+                </li>
                 <?php if (session()->isLoggedIn) : ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('login/signout') ?>">Sair</a>

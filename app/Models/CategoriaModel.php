@@ -8,13 +8,11 @@ class CategoriaModel extends BaseModel
 {
     protected $table = 'categorias';
     protected $primaryKey = 'chave';
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
     
     protected $deletedField = 'deleted_at';
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
-
-    protected $beforeDelete = ['checaPropriedade'];
 
     protected $useTimestamps = true;
 
@@ -29,6 +27,9 @@ class CategoriaModel extends BaseModel
         'vinculaIdUsuario',
         'geraChave' 
     ];
+
+    protected $beforeUpdate = ['checaPropriedade'];
+    protected $beforeDelete = ['checaPropriedade'];
 
     protected $validationRules = [
         'descricao' => [
@@ -45,7 +46,7 @@ class CategoriaModel extends BaseModel
 
     // gera uma array de categorias pronta para ser populada na função form_dropdown
     // se for passado o parametro $opcaoNova insere a opção "Nova Categoria"
-    public function formDropDown(array $params) {
+    public function formDropDown(array $params = []) {
         $this->select('id, descricao, tipo');
         
         if (!is_null($params) && isset($params['tipo'])) {
@@ -87,8 +88,22 @@ class CategoriaModel extends BaseModel
             lancamentos.descricao AS descricao_lancamento, 
             lancamentos.id AS id_lancamentos'
         );
-        $this->join('lancamentos', 'lancamentos.categorias_id = categorias.id');
+        $this->join('lancamentos', 'lancamentos.categorias_id = categorias.id', 'inner');
         $this->groupBy('descricao_categoria');
+        
         return $this->findAll();
+    }
+
+    public function getTipoByCategoria($idCategoria = null) {
+        if (is_null($idCategoria) || empty($idCategoria)) {
+            return null;
+        }
+        $categoria = $this->select('tipo')
+            ->where(['id' => $idCategoria])
+            ->first();
+        if (is_null($categoria)) {
+            return null;
+        }
+        return $categoria['tipo'];
     }
 }

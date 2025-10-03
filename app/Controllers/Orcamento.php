@@ -40,15 +40,15 @@ class Orcamento extends BaseController
         $data = [
             'titulo' => 'Novo orçamento',
             'formDropDown' => $this->categoriaModel
-            ->addOrder([
-                'campo' => 'descricao',
-                'sentido' => 'asc'
-            ])
-            ->addUserId($this->session->id_usuario)
-            ->formDropDown([
-                'opcaoNova' => true,
-                'tipo' => 'd'
-            ])
+                ->addOrder([
+                    'campo' => 'descricao',
+                    'sentido' => 'asc'
+                ])
+                ->addUserId($this->session->id_usuario)
+                ->formDropDown([
+                    'opcaoNova' => true,
+                    'tipo' => 'd'
+                ])
         ];
         echo view('orcamentos/form', $data);
     }

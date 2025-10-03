@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Admin;
 
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
@@ -43,6 +43,15 @@ abstract class BaseController extends Controller
      */
     protected $session;
 
+    public function __construct()
+    {
+        $this->session = \Config\Services::session();
+        $this->session->start(); 
+        if (!$this->session->has('id_usuario')) {
+            $this->session->set('id_usuario', 1);
+        }
+    }
+
     /**
      * @return void
      */
@@ -54,10 +63,5 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         $this->session = service('session');
-   
-        $this->session->set('id_usuario', 1);
-        $this->session->set('chave', 'abc');
-        $this->session->set('ids_filhos', [1, 3, 5]);
-        $this->session->set('email', 'julio@email.com');
     }
 }

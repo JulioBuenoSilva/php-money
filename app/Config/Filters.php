@@ -73,7 +73,8 @@ class Filters extends BaseFilters
             'csrf' => [
                 'except' => [
                     'Ajax/Categoria/store',
-                    'Ajax/Categoria/get'
+                    'Ajax/Categoria/get',
+                    'Ajax/Usuario/store'
                 ]
             ]
             // 'invalidchars',

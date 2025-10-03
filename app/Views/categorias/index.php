@@ -5,7 +5,7 @@ echo $this->section('content');?>
 
 <script>
     function confirma() {
-        if (!confirm('Deseja mesmo excluir a categoria ?')) {
+        if (!confirm('Deseja mesmo excluir a categoria? Todos os lançamentos e orçamentos associados a ela também serão excluídos')) {
             return false;
         }
         return true

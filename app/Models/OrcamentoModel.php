@@ -11,7 +11,7 @@ class OrcamentoModel extends BaseModel
     protected $useAutoIncrement = true;
 
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+    protected $useSoftDeletes   = false;
 
     protected $allowedFields    = [
         'chave',
@@ -32,7 +32,7 @@ class OrcamentoModel extends BaseModel
     protected $deletedField  = 'deleted_at';
 
     protected $beforeInsert = ['corrigeValor', 'vinculaIdUsuario', 'geraChave'];
-    protected $beforeUpdate = ['corrigeValor'];
+    protected $beforeUpdate = ['corrigeValor', 'checaPropriedade'];
     protected $beforeDelete = ['checaPropriedade'];
 
     protected $validationRules = [
@@ -65,7 +65,20 @@ class OrcamentoModel extends BaseModel
                 notificar_por_email
             "
         );
-        $this->join('categorias', 'categorias.id = orcamentos.categorias_id');
+        $this->join('categorias', 'categorias.id = orcamentos.categorias_id and categorias.deleted_at IS NULL');
         return $this->findAll();
+    }
+
+    // retorna o valor do orçamento para determinada categoria, se possuir um orçamento definido
+    public function valorOrcamento($idCategoria = null) {
+        if (is_null($idCategoria)) { 
+            return $this;
+        }
+        $result = $this
+                ->select('valor')
+                ->join('categorias', 'categorias.id = orcamentos.categorias_id')
+                ->where('categorias.id', $idCategoria)
+                ->first();
+        return $result['valor'] ?? null;
     }
 }

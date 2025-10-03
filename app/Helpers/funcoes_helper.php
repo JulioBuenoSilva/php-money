@@ -19,19 +19,37 @@
 
     // converte data de formato americano para formato brasileiro
     // se o segundo parametro for true tambem mostra a hora, minuto e segundo
-    function toDataBR($data, $mostrarHora = false) {
-
-        return $mostrarHora ? date('d/m/Y H:i:s', strtoTime($data)) : date('d/m/Y', strtoTime($data));
-    }
-
-    // converte data de formato brasileiro para formato americano
-    function toDataEUA($data) {
-        $partes = explode('/', $data);
-        if (count($partes) === 3) {
-            return "{$partes[2]}-{$partes[1]}-{$partes[0]}";
+    function toDataBr($dataUsa, $mostrarHora = false) {
+        if (empty($dataUsa)) {
+            return null;
         }
+
+        // Se vier no formato completo: Y-m-d H:i:s
+        if ($mostrarHora && preg_match('/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/', $dataUsa, $m)) {
+            $hora = $m[4] . ':' . $m[5];
+            if (!empty($m[6])) {
+                $hora .= ':' . $m[6];
+            }
+            return $m[3] . '/' . $m[2] . '/' . $m[1] . ' ' . $hora;
+        }
+
+        // Só data: Y-m-d
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dataUsa, $m)) {
+            return $m[3] . '/' . $m[2] . '/' . $m[1];
+        }
+
         return null;
     }
+
+
+    // converte data de formato brasileiro para formato americano
+    function toDataEUA($dataBr) {
+        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $dataBr, $m)) {
+            return $m[3] . '-' . $m[2] . '-' . $m[1];
+        }
+        return null; // inválido
+    }
+
 
     // retorna um conjunto de anos entre o ano atual e o primeiro registrado
     function comboAnos(array $params) {
@@ -39,7 +57,7 @@
         $anoFinal = date("Y");
 
         $result = [];
-        while ($anoInicial >= $anoFinal) {
+        while ($anoInicial <= $anoFinal) {
             $result += [
                 $anoInicial => $anoInicial
             ];

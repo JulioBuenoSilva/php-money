@@ -10,7 +10,7 @@ class LancamentoModel extends BaseModel
 
     protected $primaryKey = 'chave';
 
-    protected $useSoftDeletes = true; 
+    protected $useSoftDeletes = false; 
     
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
@@ -55,25 +55,26 @@ class LancamentoModel extends BaseModel
     // busca todos os lancamentos de uma determinada categoria
     public function getByIdCategoria($idCategoria) 
     {
+        $this->addTableCategorias();
+
         $this->select("
             lancamentos.id AS id_lancamento,
             lancamentos.created_at,
             lancamentos.usuarios_id,
             categorias.tipo,
-            if (tipo = 'r', 'Receita', 'Despesa') AS tipo_formatado,
+            categorias.descricao AS descricao_categoria,
+            IF(categorias.tipo = 'r', 'Receita', 'Despesa') AS tipo_formatado,
             lancamentos.descricao,
             lancamentos.data,
             lancamentos.categorias_id,
             lancamentos.notificar_por_email,
-            if (notificar_por_email = '1', 'Sim', 'Nao') AS notificar_formatado,
+            IF(lancamentos.notificar_por_email = '1', 'Sim', 'Nao') AS notificar_formatado,
             lancamentos.valor,
             lancamentos.chave,
             lancamentos.consolidado,
-            if (consolidado = '1', 'Sim', 'Nao') AS consolidado_formatado,
-  
+            IF(lancamentos.consolidado = '1', 'Sim', 'Nao') AS consolidado_formatado
         ");
-        $this->join('categorias', 'lancamentos.categorias_id = categorias.id');
-        $this->where('categorias_id', $idCategoria);
+        $this->where('lancamentos.categorias_id', $idCategoria);
         return $this->findAll();
     }
     
@@ -115,5 +116,13 @@ class LancamentoModel extends BaseModel
         $totalReceitas = (float) $this->first()['valor'];
 
         return ($totalReceitas ?? 0) - ($totalDespesas ?? 0);
+    }
+        
+    // injeta a tabela categorias quando necessário 
+    public function addTableCategorias(): object
+    {
+        $this->join('categorias', 'categorias.id = lancamentos.categorias_id');
+        $this->where('categorias.deleted_at IS NULL');
+        return $this;
     }
 }

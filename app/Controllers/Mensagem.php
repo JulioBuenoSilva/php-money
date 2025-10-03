@@ -12,7 +12,7 @@ class Mensagem extends BaseController {
         } else {
             echo view('_common/mensagens/sucesso', [
                 'mensagem' => $mensagem,
-                'link' => anchor(base_url(), 'Pagina Inicial', ['class' => 'nav-link'])
+                'link' => "<a href='javascript:history.back()' class='nav-link'>Voltar</a>"
             ]);
         }
     }

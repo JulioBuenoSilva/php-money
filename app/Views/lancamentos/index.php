@@ -1,9 +1,13 @@
-<?php echo $this->extend('_common/layout');
+<?php
+
+use function PHPUnit\Framework\isNull;
+
+ echo $this->extend('_common/layout');
 echo $this->section('content');?>
 
 <script>
     function confirma() {
-        if (!confirm('Deseja mesmo excluir a categoria ?')) {
+        if (!confirm('Deseja mesmo excluir este registro?')) {
             return false;
         }
         return true
@@ -72,17 +76,17 @@ echo $this->section('content');?>
             <div class="my-3">
                 <?= form_open('lancamento', ['id' => 'formAno'])?>
                     <?= csrf_field() ?>
-                    <?= form_dropDown('ano', [2017 => 2017, 2018 => 2018, 2019 => 2019, 2020 => 2020, 2025 => 2025], $ano, ['id' =>'ano', 'class' => 'form-control mb-2']) ?>
+                    <?= form_dropDown('ano', $comboAnos, $ano, ['id' =>'ano', 'class' => 'form-control mb-2']) ?>
                     <input type="hidden" name="mes" value="<?= $mes ?>"> 
                 <?= form_close() ?>
             </div>
         </div>
-        <div class="row no-gutters d-flex justify-content-center mb-3">
+        <div class="row no-gutters d-flex justify-content-center justify-content-md-between mb-3 bg-light rounded">
             <?php 
                 $meses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
                 foreach ($meses as $mes_loop): ?>
-                    <?php $classe = $mes == $mes_loop ? 'bg-warning' : '' ; ?>
-                    <a href="<?=base_url("lancamento/index/{$mes_loop}/{$ano}")?>" class="nav-link <?=  $classe ?>"> 
+                    <?php $classeMes = $mes == $mes_loop ? 'bg-primary text-light rounded' : '' ; ?>
+                    <a href="<?=base_url("lancamento/index/{$mes_loop}/{$ano}")?>" class="nav-link <?=  $classeMes ?>"> 
                         <span class="text-uppercase small"> <?= nomeMes($mes_loop)?></span>
                     </a>            
             <?php endforeach ?>
@@ -103,12 +107,23 @@ echo $this->section('content');?>
                 <tbody>
                     <?php if (count($categorias) > 0) : ?>
                         <?php foreach ($categorias as $categoria): ?>
+                            <?php $classe = $categoria['valorOrcamento'] > $categoria['totalPorCategoria'] ? 'text-info' : 'text-danger'?>
                             <tr class="bg-light">
-                                <td colspan="7" class="justify-content-start"><strong> <?= $categoria['descricao'] ?> </strong></td>
+                                <td colspan="7" class="justify-content-start"><strong> <?= $categoria['descricao'] ?> <span class="<?= $classe ?> mx-2"><?= !is_null($categoria['valorOrcamento']) ? '- Orçamento: R$ ' . number_format($categoria['valorOrcamento'], 2, ',', '.') : '' ?></strong></span> 
+                                    <?php if (!empty($categoria['orcamentoDisponivel'] && !empty($categoria['valorOrcamento']))) : ?>
+                                        <small>
+                                            <span class="<?= $classe?> mx-2"> 
+                                                <?= ($categoria['orcamentoDisponivel'] > 0 ) ?
+                                                '- Disponível: R$ ' . number_format($categoria['orcamentoDisponivel'], 2, ',', '.') : 
+                                                '- Estourado em: R$ ' . number_format(($categoria['orcamentoDisponivel'] * -1), 2, ',', '.') ?> 
+                                            </span>
+                                        </small>
+                                    <?php endif ?>  
+                                </td>
                             </tr>
                             <?php foreach ($categoria['lancamentos'] as $lancamento): ?>
-                                <?php $classe = $lancamento['tipo'] === 'd' ? 'text-danger' : 'text-success' ?>
-                                <tr class="<?= $classe?>">
+                                <?php $classeLancamento = $lancamento['tipo'] === 'd' ? 'text-danger' : 'text-success' ?>
+                                <tr class="<?= $classeLancamento?>">
                                     <td class="pl-5"> <?= $lancamento['descricao'] ?> </td>
                                     <td> <?= toDataBr($lancamento['data']) ?> </td>
                                     <td> <?= $lancamento['tipo_formatado']?> </td>
@@ -131,31 +146,35 @@ echo $this->section('content');?>
                                 <td colspan="7" class="text-center"> Nenhum lançamento encontrado </td>
                             </tr>
                     <?php endif ?>
-                    <tr> 
-                        <td colspan="7" class="bg-light font-weight-bold text-uppercase"> <strong>Totalizador</strong></td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="text-right">Saldo do Mês Anterior:</td>
-                        <td colspan="1"> <strong> R$ <?= number_format($saldoMesAnterior, 2, ',', '.')?> </strong> </td>
-                    </tr>
-                    <tr> 
-                        <td colspan="3" class="text-success text-right">Receitas neste Mês</td>
-                        <td colspan="3" class="text-success"> R$ <?= number_format($receitasMesAtual, 2, ',', '.') ?></td>
-                    </tr>
-                    <tr> 
-                        <td colspan="3" class="text-danger text-right">Despesas neste Mês</td>
-                        <td colspan="3" class="text-danger"> R$ <?= number_format($despesasMesAtual, 2, ',', '.') ?></td>
-                    </tr>
-                    <tr> 
-                        <td colspan="3" class="text-right"><strong> Saldo neste Mês </strong></td>
-                        <?php if ($saldoMesAtual > 0 ) : ?> 
-                            <td colspan="3" class="text-success font-weight-bold"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
-                        <?php elseif ($saldoMesAtual < 0) : ?>
-                            <td colspan="3" class="text-danger font-weight-bold"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
-                        <?php else : ?>
-                            <td colspan="3"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
-                        <?php endif ?>
-                    </tr>
+                    <?php if (empty($search)) :?>
+                        <tr> 
+                            <td colspan="7" class="bg-light font-weight-bold text-uppercase"> <strong>Totalizador</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-right ">Saldo do Mês Anterior:</td>
+                            <td colspan="2" class="justify-content-start" > <strong> R$ <?= number_format($saldoMesAnterior, 2, ',', '.')?> </strong> </td>
+                        </tr>
+                        <tr> 
+                            <td colspan="5" class="offset-md-2 text-success text-right">Receitas neste Mês:</td>
+                            <td colspan="2" class="justify-content-start text-success"> R$ <?= number_format($receitasMesAtual, 2, ',', '.') ?></td>
+                        </tr>
+                        <tr> 
+                            <td colspan="5" class="text-danger text-right">Despesas neste Mês:</td>
+                            <td colspan="2" class="justify-content-start text-danger"> R$ <?= number_format($despesasMesAtual, 2, ',', '.') ?></td>
+                        </tr>
+                        <tr> 
+                            <?php if ($saldoMesAtual > 0 ) : ?> 
+                                <td colspan="5" class="text-right text-success "><strong> Saldo neste Mês: </strong></td>
+                                <td colspan="2" class="text-success font-weight-bold justify-content-start"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
+                            <?php elseif ($saldoMesAtual < 0) : ?>
+                                <td colspan="5" class="text-right text-danger"><strong> Saldo neste Mês: </strong></td>
+                                <td colspan="2" class="text-danger font-weight-bold justify-content-start"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
+                            <?php else : ?>
+                                <td colspan="5" class="text-right"><strong> Saldo neste Mês: </strong></td>
+                                <td colspan="2"> R$ <?= number_format($saldoMesAtual, 2, ',', '.') ?></td>
+                            <?php endif ?>
+                        </tr>
+                    <?php endif ?>
                 </tbody>
             </table>
         </div>
